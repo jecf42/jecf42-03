@@ -1,0 +1,486 @@
+
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>UFTG - Unicode Fancy Text Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Merriweather:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#1a73e8;
+    --frame:#dce6f0;
+    --border:#173a7a;
+    --muted:#6b7280;
+    --card-bg:#e6eef8;
+    --bg:#f5f6f8;
+    --text:#111;
+    --font-main: 'Inter', Arial, Helvetica, sans-serif;
+  }
+  [data-theme="dark"]{
+    --blue:#5aa0ff;
+    --frame:#131419;
+    --border:#2b3340;
+    --muted:#9aa4b2;
+    --card-bg:#101316;
+    --bg:#0b0d10;
+    --text:#e6eef8;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:var(--font-main);
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+  .container{width:100%;padding:0 18px 80px}
+  header{background:var(--bg);padding:18px;}
+  header .title{display:flex;flex-direction:column;gap:6px}
+  header h1{margin:0;font-size:36px;line-height:1;font-family:Inter, Arial, Helvetica, sans-serif;}
+  header p{margin:0;color:var(--muted);font-family:Inter, Arial, Helvetica, sans-serif;}
+
+  .topbar{position:sticky;top:0;z-index:600;margin-top:12px;background:var(--frame);padding:12px;border-radius:6px;display:flex;gap:12px;align-items:center;border-bottom:3px solid var(--border)}
+  .topbar input{flex:1;padding:10px 12px;border:2px solid var(--border);border-radius:6px;font-size:16px;background:var(--card-bg);color:var(--text)}
+  .btn-paste,.settings-btn{background:var(--blue);color:#fff;border:none;padding:10px 14px;border-radius:6px;cursor:pointer;font-weight:700}
+  .theme-toggle{background:transparent;border:2px solid var(--border);color:var(--text);padding:8px;border-radius:6px;cursor:pointer;font-weight:700}
+
+  .section{margin-top:18px}
+  .section .heading{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;font-size:18px;padding:6px 0}
+  .tri{width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--text);transform:rotate(0);transition:transform .15s}
+  .tri.closed{transform:rotate(-90deg)}
+  .list{margin-top:8px;display:block}
+  .list.hidden{display:none}
+
+  .card { border: 2px solid var(--border); border-radius: 10px; background: var(--card-bg); padding: 12px; margin-bottom: 12px; width: 100%; box-sizing: border-box; color:var(--text)}
+  .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .card-title{font-weight:700;font-size:20px}
+  .card-actions{display:flex;align-items:center;gap:10px}
+  .copy-btn{background:var(--blue);color:#fff;border:0;padding:8px 14px;border-radius:6px;cursor:pointer;font-weight:700}
+  .star{cursor:pointer;font-size:20px;color:gray;user-select:none}
+  .star.active{color:gold}
+  .card-body{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;min-height:44px;white-space:pre-wrap;word-break:break-word;color:var(--text)}
+  .card-body .red { color: #ff6b6b; font-weight: 700; }
+
+  .copy-notice, .paste-notice {
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    background: var(--blue);
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight:700;
+    opacity:0; transform: translateY(6px);
+    transition:opacity .18s, transform .18s;
+    z-index:1200;
+  }
+  .notice.show{opacity:1; transform: translateY(0);}
+
+  .settings-panel {
+    position: fixed;
+    right: 18px;
+    top: 90px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    width: 240px;
+    z-index: 900;
+    color:var(--text);
+  }
+  .settings-panel.active{display:flex}
+  .settings-panel h3{margin:0;font-size:14px;font-weight:700;color:var(--text)}
+  .theme-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:6px}
+  .theme-btn{color:#fff;font-weight:700;padding:8px 0;border:none;border-radius:6px;cursor:pointer;font-size:14px}
+  .font-buttons{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .font-btn{flex:1 1 45%;padding:8px 6px;border:1px solid var(--border);border-radius:6px;background:transparent;cursor:pointer;font-weight:600;font-size:13px;color:var(--text)}
+
+  .settings-backdrop{position:fixed;inset:0;display:none;z-index:800}
+  .settings-backdrop.active{display:block}
+
+  @media (max-width:640px){
+    header h1{font-size:28px}
+    .topbar{flex-direction:column;align-items:stretch}
+    .copy-btn{padding:8px 10px}
+    .card{width:calc(100% - 36px)}
+    .settings-panel{right:12px;left:12px;width:auto;border-radius:8px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="title">
+    <h1>UFTG</h1>
+    <p>Unicode Fancy Text Generator</p>
+  </div>
+</header>
+
+<div class="topbar" role="group" aria-label="Beviteli sor">
+  <input id="mainInput" type="text" placeholder="Írj be akármit..." aria-label="Szöveg beviteli mező">
+  <button class="btn-paste" id="pasteBtn" title="Beillesztés">Beillesztés</button>
+  <button class="settings-btn" id="settingsBtn" aria-expanded="false" aria-controls="settingsPanel">Beállítások</button>
+</div>
+
+<div id="copyNotice" class="copy-notice notice">✓ Másolva</div>
+<div id="pasteNotice" class="paste-notice notice">✓ Beillesztve</div>
+
+<div class="settings-backdrop" id="settingsBackdrop" aria-hidden="true"></div>
+<div class="settings-panel" id="settingsPanel" role="region" aria-label="Beállítások">
+  <div>
+    <h3>Témaválasztó</h3>
+    <div class="theme-buttons" role="menu">
+      <button class="theme-btn" data-color="blue" style="background:#1a73e8">Kék</button>
+      <button class="theme-btn" data-color="yellow" style="background:#fbbc05;color:#000">Sárga</button>
+      <button class="theme-btn" data-color="red" style="background:#ea4335">Piros</button>
+      <button class="theme-btn" data-color="purple" style="background:#a142f4">Lila</button>
+      <button class="theme-btn" data-color="green" style="background:#34a853">Zöld</button>
+      <button class="theme-btn" data-color="pink" style="background:#ff5fa2">Rózsaszín</button>
+      <button class="theme-btn" data-color="dark" style="background:#222">Sötét</button>
+      <button class="theme-btn" data-color="light" style="background:#fff;color:#000">Világos</button>
+    </div>
+  </div>
+
+  <div>
+    <h3>Betűtípus</h3>
+    <div class="font-buttons" role="menu">
+      <button class="font-btn" data-font="Inter" style="font-family:Inter">Inter</button>
+      <button class="font-btn" data-font="Merriweather" style="font-family:Merriweather">Merriweather</button>
+      <button class="font-btn" data-font="Roboto" style="font-family:Roboto">Roboto</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+    <small style="color:var(--muted)">Mentett beállítások</small>
+    <button id="resetSettings" class="theme-btn" style="background:#aaa;color:#000;padding:6px 10px">Reset</button>
+  </div>
+</div>
+
+<main class="container">
+  <section class="section" id="section-recent">
+    <div class="heading" data-target="recentList" role="button" tabindex="0">
+      <div class="tri closed" id="tri-recent"></div>
+      <div>Legutóbbiak</div>
+    </div>
+    <div id="recentList" class="list hidden"></div>
+  </section>
+
+  <section class="section" id="section-favs">
+    <div class="heading" data-target="favList" role="button" tabindex="0">
+      <div class="tri closed" id="tri-fav"></div>
+      <div>Kedvencek</div>
+    </div>
+    <div id="favList" class="list hidden"></div>
+  </section>
+
+  <section class="section" id="section-fonts">
+    <div class="heading" data-target="fontsList" role="button" tabindex="0">
+      <div class="tri" id="tri-fonts"></div>
+      <div>Betűtípusok</div>
+    </div>
+    <div id="fontsList" class="list"></div>
+  </section>
+</main>
+
+<script>
+/* ====== CONFIG / DATA ====== */
+const THEMES = {
+  blue:{'--blue':'#1a73e8','--border':'#173a7a','--frame':'#dce6f0','--card-bg':'#e6eef8','--bg':'#f5f6f8','--text':'#111'},
+  yellow:{'--blue':'#fbbc05','--border':'#b68b00','--frame':'#fff4cc','--card-bg':'#fff8e6','--bg':'#fff9ec','--text':'#111'},
+  red:{'--blue':'#ea4335','--border':'#a11d10','--frame':'#ffe5e0','--card-bg':'#ffecec','--bg':'#fff5f4','--text':'#111'},
+  purple:{'--blue':'#a142f4','--border':'#5e239f','--frame':'#f2e5ff','--card-bg':'#f7ecff','--bg':'#fbf6ff','--text':'#111'},
+  green:{'--blue':'#34a853','--border':'#1b6e35','--frame':'#e0f7e9','--card-bg':'#eafbee','--bg':'#f6fff7','--text':'#111'},
+  pink:{'--blue':'#ff5fa2','--border':'#b01f67','--frame':'#ffe0ef','--card-bg':'#fff0f7','--bg':'#fff6fb','--text':'#111'},
+  dark:{'--theme':'dark'},
+  light:{'--theme':'light'}
+};
+
+/* 17 style defs (same as your 3rd version) */
+const STYLE_DEFS = [
+  {id:'Plain', name:'Plain', map:{a:"a",b:"b",c:"c",d:"d",e:"e",f:"f",g:"g",h:"h",i:"i",j:"j",k:"k",l:"l",m:"m",n:"n",o:"o",p:"p",q:"q",r:"r",s:"s",t:"t",u:"u",v:"v",w:"w",x:"x",y:"y",z:"z",
+      A:"A",B:"B",C:"C",D:"D",E:"E",F:"F",G:"G",H:"H",I:"I",J:"J",K:"K",L:"L",M:"M",N:"N",O:"O",P:"P",Q:"Q",R:"R",S:"S",T:"T",U:"U",V:"V",W:"W",X:"X",Y:"Y",Z:"Z"} },
+  {id:'Bold', name:'Bold', map:{a:"𝗮",b:"𝗯",c:"𝗰",d:"𝗱",e:"𝗲",f:"𝗳",g:"𝗴",h:"𝗵",i:"𝗶",j:"𝗷",k:"𝗸",l:"𝗹",m:"𝗺",n:"𝗻",o:"𝗼",p:"𝗽",q:"𝗾",r:"𝗿",s:"𝘀",t:"𝘁",u:"𝘂",v:"𝘃",w:"𝘄",x:"𝘅",y:"𝘆",z:"𝘇",
+      A:"𝗔",B:"𝗕",C:"𝗖",D:"𝗗",E:"𝗘",F:"𝗙",G:"𝗚",H:"𝗛",I:"𝗜",J:"𝗝",K:"𝗞",L:"𝗟",M:"𝗠",N:"𝗡",O:"𝗢",P:"𝗣",Q:"𝗤",R:"𝗥",S:"𝗦",T:"𝗧",U:"𝗨",V:"𝗩",W:"𝗪",X:"𝗫",Y:"𝗬",Z:"𝗭"} },
+  {id:'Bold Italic', name:'Bold Italic', map:{a:"𝒂",b:"𝒃",c:"𝒄",d:"𝒅",e:"𝒆",f:"𝒇",g:"𝒈",h:"𝒉",i:"𝒊",j:"𝒋",k:"𝒌",l:"𝒍",m:"𝒎",n:"𝒏",o:"𝒐",p:"𝒑",q:"𝒒",r:"𝒓",s:"𝒔",t:"𝒕",u:"𝒖",v:"𝒗",w:"𝒘",x:"𝒙",y:"𝒚",z:"𝒛",
+      A:"𝑨",B:"𝑩",C:"𝑪",D:"𝑫",E:"𝑬",F:"𝑭",G:"𝑮",H:"𝑯",I:"𝑰",J:"𝑱",K:"𝑲",L:"𝑳",M:"𝑴",N:"𝑵",O:"𝑶",P:"𝑷",Q:"𝑸",R:"𝑹",S:"𝑺",T:"𝑻",U:"𝑼",V:"𝑽",W:"𝑾",X:"𝑿",Y:"𝒀",Z:"𝒁"} },
+  {id:'Italic', name:'Italic', map:{a:"𝑎",b:"𝑏",c:"𝑐",d:"𝑑",e:"𝑒",f:"𝑓",g:"𝑔",h:"ℎ",i:"𝑖",j:"𝑗",k:"𝑘",l:"𝑙",m:"𝑚",n:"𝑛",o:"𝑜",p:"𝑝",q:"𝑞",r:"𝑟",s:"𝑠",t:"𝑡",u:"𝑢",v:"𝑣",w:"𝑤",x:"𝑥",y:"𝑦",z:"𝑧",
+      A:"𝐴",B:"𝐵",C:"𝐶",D:"𝐷",E:"𝐸",F:"𝐹",G:"𝐺",H:"𝐻",I:"𝐼",J:"𝐽",K:"𝐾",L:"𝐿",M:"𝑀",N:"𝑁",O:"𝑂",P:"𝑃",Q:"𝑄",R:"𝑅",S:"𝑆",T:"𝑇",U:"𝑈",V:"𝑉",W:"𝑊",X:"𝑋",Y:"𝑌",Z:"𝑍"} },
+  {id:'Monospace', name:'Monospace', map:{a:"𝚊",b:"𝚋",c:"𝚌",d:"𝚍",e:"𝚎",f:"𝚏",g:"𝚐",h:"𝚑",i:"𝚒",j:"𝚓",k:"𝚔",l:"𝚕",m:"𝚖",n:"𝚗",o:"𝚘",p:"𝚙",q:"𝚚",r:"𝚛",s:"𝚜",t:"𝚝",u:"𝚞",v:"𝚟",w:"𝚠",x:"𝚡",y:"𝚢",z:"𝚣",
+      A:"𝙰",B:"𝙱",C:"𝙲",D:"𝙳",E:"𝙴",F:"𝙵",G:"𝙶",H:"𝙷",I:"𝙸",J:"𝙹",K:"𝙺",L:"𝙻",M:"𝙼",N:"𝙽",O:"𝙾",P:"𝙿",Q:"𝚀",R:"𝚁",S:"𝚂",T:"𝚃",U:"𝚄",V:"𝚅",W:"𝚆",X:"𝚇",Y:"𝚈",Z:"𝚉"} },
+  {id:'Script', name:'Script', map:{a:"𝒶",b:"𝒷",c:"𝒸",d:"𝒹",e:"𝑒",f:"𝒻",g:"ℊ",h:"𝒽",i:"𝒾",j:"𝒿",k:"𝓀",l:"𝓁",m:"𝓂",n:"𝓃",o:"ℴ",p:"𝓅",q:"𝓆",r:"𝓇",s:"𝓈",t:"𝓉",u:"𝓊",v:"𝓋",w:"𝓌",x:"𝓍",y:"𝓎",z:"𝓏",
+      A:"𝒜",B:"ℬ",C:"𝒞",D:"𝒟",E:"ℰ",F:"ℱ",G:"𝒢",H:"ℋ",I:"ℐ",J:"𝒥",K:"𝒦",L:"ℒ",M:"ℳ",N:"𝒩",O:"𝒪",P:"𝒫",Q:"𝒬",R:"ℛ",S:"𝒮",T:"𝒯",U:"𝒰",V:"𝒱",W:"𝒲",X:"𝒳",Y:"𝒴",Z:"𝒵"} },
+  {id:'Fraktur', name:'Fraktur', map:{a:"𝔞",b:"𝔟",c:"𝔠",d:"𝔡",e:"𝔢",f:"𝔣",g:"𝔤",h:"𝔥",i:"𝔦",j:"𝔧",k:"𝔨",l:"𝔩",m:"𝔪",n:"𝔫",o:"𝔬",p:"𝔭",q:"𝔮",r:"𝔯",s:"𝔰",t:"𝔱",u:"𝔲",v:"𝔳",w:"𝔴",x:"𝔵",y:"𝔶",z:"𝔷",
+      A:"𝔄",B:"𝔅",C:"ℭ",D:"𝔇",E:"𝔈",F:"𝔉",G:"𝔊",H:"ℌ",I:"ℑ",J:"𝔍",K:"𝔎",L:"𝔏",M:"𝔐",N:"𝔑",O:"𝔒",P:"𝔓",Q:"𝔔",R:"ℜ",S:"𝔖",T:"𝔗",U:"𝔘",V:"𝔙",W:"𝔚",X:"𝔛",Y:"𝔜",Z:"𝔝"} },
+  {id:'DoubleStruck', name:'Double Struck', map:{a:"𝕒",b:"𝕓",c:"𝕔",d:"𝕕",e:"𝕖",f:"𝕗",g:"𝕘",h:"𝕙",i:"𝕚",j:"𝕛",k:"𝕜",l:"𝕝",m:"𝕞",n:"𝕟",o:"𝕠",p:"𝕡",q:"𝕢",r:"𝕣",s:"𝕤",t:"𝕥",u:"𝕦",v:"𝕧",w:"𝕨",x:"𝕩",y:"𝕪",z:"𝕫",
+      A:"𝔸",B:"𝔹",C:"ℂ",D:"𝔻",E:"𝔼",F:"𝔽",G:"𝔾",H:"ℍ",I:"𝕀",J:"𝕁",K:"𝕂",L:"𝕃",M:"𝕄",N:"ℕ",O:"𝕆",P:"ℙ",Q:"ℚ",R:"ℝ",S:"𝕊",T:"𝕋",U:"𝕌",V:"𝕍",W:"𝕎",X:"𝕏",Y:"𝕐",Z:"ℤ"} },
+  {id:'BoldFraktur', name:'Bold Fraktur', map:{a:"𝖆",b:"𝖇",c:"𝖈",d:"𝖉",e:"𝖊",f:"𝖋",g:"𝖌",h:"𝖍",i:"𝖎",j:"𝖏",k:"𝖐",l:"𝖑",m:"𝖒",n:"𝖓",o:"𝖔",p:"𝖕",q:"𝖖",r:"𝖗",s:"𝖘",t:"𝖙",u:"𝖚",v:"𝖛",w:"𝖜",x:"𝖝",y:"𝖞",z:"𝖟",
+      A:"𝕬",B:"𝕭",C:"𝕮",D:"𝕯",E:"𝕰",F:"𝕱",G:"𝕲",H:"𝕳",I:"𝕴",J:"𝕵",K:"𝕶",L:"𝕷",M:"𝕸",N:"𝕹",O:"𝕺",P:"𝕻",Q:"𝕼",R:"𝕽",S:"𝕾",T:"𝕿",U:"𝖀",V:"𝖁",W:"𝖂",X:"𝖃",Y:"𝖄",Z:"𝖅"} },
+  {id:'Circle', name:'Circle', map:{a:"ⓐ",b:"ⓑ",c:"ⓒ",d:"ⓓ",e:"ⓔ",f:"ⓕ",g:"ⓖ",h:"ⓗ",i:"ⓘ",j:"ⓙ",k:"ⓚ",l:"ⓛ",m:"ⓜ",n:"ⓝ",o:"ⓞ",p:"ⓟ",q:"ⓠ",r:"ⓡ",s:"ⓢ",t:"ⓣ",u:"ⓤ",v:"ⓥ",w:"ⓦ",x:"ⓧ",y:"ⓨ",z:"ⓩ",
+      A:"Ⓐ",B:"Ⓑ",C:"Ⓒ",D:"Ⓓ",E:"Ⓔ",F:"Ⓕ",G:"Ⓖ",H:"Ⓗ",I:"Ⓘ",J:"Ⓙ",K:"Ⓚ",L:"Ⓛ",M:"Ⓜ",N:"Ⓝ",O:"Ⓞ",P:"Ⓟ",Q:"Ⓠ",R:"Ⓡ",S:"Ⓢ",T:"Ⓣ",U:"Ⓤ",V:"Ⓥ",W:"Ⓦ",X:"Ⓧ",Y:"Ⓨ",Z:"Ⓩ"} },
+  {id:'NegativeCircle', name:'Negative Circle', map:{a:"🅐",b:"🅑",c:"🅒",d:"🅓",e:"🅔",f:"🅕",g:"🅖",h:"🅗",i:"🅘",j:"🅙",k:"🅚",l:"🅛",m:"🅜",n:"🅝",o:"🅞",p:"🅟",q:"🅠",r:"🅡",s:"🅢",t:"🅣",u:"🅤",v:"🅥",w:"🅦",x:"🅧",y:"🅨",z:"🅩",
+      A:"🅐",B:"🅑",C:"🅒",D:"🅓",E:"🅔",F:"🅕",G:"🅖",H:"🅗",I:"🅘",J:"🅙",K:"🅚",L:"🅛",M:"🅜",N:"🅝",O:"🅞",P:"🅟",Q:"🅠",R:"🅡",S:"🅢",T:"🅣",U:"🅤",V:"🅥",W:"🅦",X:"🅧",Y:"🅨",Z:"🅩"} },
+  {id:'Square', name:'Square', map:{a:"🄰",b:"🄱",c:"🄲",d:"🄳",e:"🄴",f:"🄵",g:"🄶",h:"🄷",i:"🄸",j:"🄹",k:"🄺",l:"🄻",m:"🄼",n:"🄽",o:"🄾",p:"🄿",q:"🅀",r:"🅁",s:"🅂",t:"🅃",u:"🅄",v:"🅅",w:"🅆",x:"🅇",y:"🅈",z:"🅉",
+      A:"🄰",B:"🄱",C:"🄲",D:"🄳",E:"🄴",F:"🄵",G:"🄶",H:"🄷",I:"🄸",J:"🄹",K:"🄺",L:"🄻",M:"🄼",N:"🄽",O:"🄾",P:"🄿",Q:"🅀",R:"🅁",S:"🅂",T:"🅃",U:"🅄",V:"🅅",W:"🅆",X:"🅇",Y:"🅈",Z:"🅉"} },
+  {id:'NegativeSquare', name:'Negative Square', map:{a:"🅰",b:"🅱",c:"🅲",d:"🅳",e:"🅴",f:"🅵",g:"🅶",h:"🅷",i:"🅸",j:"🅹",k:"🅺",l:"🅻",m:"🅼",n:"🅽",o:"🅾",p:"🅿",q:"🆀",r:"🆁",s:"🆂",t:"🆃",u:"🆄",v:"🆅",w:"🆆",x:"🆇",y:"🆈",z:"🆉",
+      A:"🅰",B:"🅱",C:"🅲",D:"🅳",E:"🅴",F:"🅵",G:"🅶",H:"🅷",I:"🅸",J:"🅹",K:"🅺",L:"🅻",M:"🅼",N:"🅽",O:"🅾",P:"🅿",Q:"🆀",R:"🆁",S:"🆂",T:"🆃",U:"🆄",V:"🆅",W:"🆆",X:"🆇",Y:"🆈",Z:"🆉"} },
+  {id:'SmallCaps', name:'Small Caps', map:{a:"ᴀ",b:"ʙ",c:"ᴄ",d:"ᴅ",e:"ᴇ",f:"ꜰ",g:"ɢ",h:"ʜ",i:"ɪ",j:"ᴊ",k:"ᴋ",l:"ʟ",m:"ᴍ",n:"ɴ",o:"ᴏ",p:"ᴘ",q:"ǫ",r:"ʀ",s:"s",t:"ᴛ",u:"ᴜ",v:"ᴠ",w:"ᴡ",x:"x",y:"ʏ",z:"ᴢ",
+      A:"A",B:"B",C:"C",D:"D",E:"E",F:"F",G:"G",H:"H",I:"I",J:"J",K:"K",L:"L",M:"M",N:"N",O:"O",P:"P",Q:"Q",R:"R",S:"S",T:"T",U:"U",V:"V",W:"W",X:"X",Y:"Y",Z:"Z"} },
+  {id:'Sans', name:'Sans', map:{a:"𝖺",b:"𝖻",c:"𝖼",d:"𝖽",e:"𝖾",f:"𝖿",g:"𝗀",h:"𝗁",i:"𝗂",j:"𝗃",k:"𝗄",l:"𝗅",m:"𝗆",n:"𝗇",o:"𝗈",p:"𝗉",q:"𝗊",r:"𝗋",s:"𝗌",t:"𝗍",u:"𝗎",v:"𝗏",w:"𝗐",x:"𝗑",y:"𝗒",z:"𝗓",
+      A:"𝗔",B:"𝗕",C:"𝗖",D:"𝗗",E:"𝗘",F:"𝗙",G:"𝗚",H:"𝗛",I:"𝗜",J:"𝗝",K:"𝗞",L:"𝗟",M:"𝗠",N:"𝗡",O:"𝗢",P:"𝗣",Q:"𝗤",R:"𝗥",S:"𝗦",T:"𝗧",U:"𝗨",V:"𝗩",W:"𝗪",X:"𝗫",Y:"𝗬",Z:"𝗭"} },
+  {id:'Sans Bold', name:'Sans Bold', map:{a:"𝗮",b:"𝗯",c:"𝗰",d:"𝗱",e:"𝗲",f:"𝗳",g:"𝗴",h:"𝗵",i:"𝗶",j:"𝗷",k:"𝗸",l:"𝗹",m:"𝗺",n:"𝗻",o:"𝗼",p:"𝗽",q:"𝗾",r:"𝗿",s:"𝘀",t:"𝘁",u:"𝘂",v:"𝘃",w:"𝘄",x:"𝘅",y:"𝘆",z:"𝘇",
+      A:"𝗔",B:"𝗕",C:"𝗖",D:"𝗗",E:"𝗘",F:"𝗙",G:"𝗚",H:"𝗛",I:"𝗜",J:"𝗝",K:"𝗞",L:"𝗟",M:"𝗠",N:"𝗡",O:"𝗢",P:"𝗣",Q:"𝗤",R:"𝗥",S:"𝗦",T:"𝗧",U:"𝗨",V:"𝗩",W:"𝗪",X:"𝗫",Y:"𝗬",Z:"𝗭"} },
+  {id:'Sans Italic', name:'Sans Italic', map:{a:"𝘢",b:"𝘣",c:"𝘤",d:"𝘥",e:"𝘦",f:"𝘧",g:"𝘨",h:"𝘩",i:"𝘪",j:"𝘫",k:"𝘬",l:"𝘭",m:"𝘮",n:"𝘯",o:"𝘰",p:"𝘱",q:"𝘲",r:"𝘳",s:"𝘴",t:"𝘵",u:"𝘶",v:"𝘷",w:"𝘸",x:"𝘹",y:"𝘺",z:"𝘻",
+      A:"𝘈",B:"𝘉",C:"𝘊",D:"𝘋",E:"𝘌",F:"𝘍",G:"𝘎",H:"𝘏",I:"𝘐",J:"𝘑",K:"𝘒",L:"𝘓",M:"𝘔",N:"𝘕",O:"𝘖",P:"𝘗",Q:"𝘘",R:"𝘙",S:"𝘚",T:"𝘛",U:"𝘜",V:"𝘝",W:"𝘞",X:"𝘟",Y:"𝘠",Z:"𝘡"} },
+  {id:'Sans Bold Italic', name:'Sans Bold Italic', map:{a:"𝙖",b:"𝙗",c:"𝙘",d:"𝙙",e:"𝙚",f:"𝙛",g:"𝙜",h:"𝙝",i:"𝙞",j:"𝙟",k:"𝙠",l:"𝙡",m:"𝙢",n:"𝙣",o:"𝙤",p:"𝙥",q:"𝙦",r:"𝙧",s:"𝙨",t:"𝙩",u:"𝙪",v:"𝙫",w:"𝙬",x:"𝙭",y:"𝙮",z:"𝙯",
+      A:"𝘼",B:"𝘽",C:"𝘾",D:"𝘿",E:"𝙀",F:"𝙁",G:"𝙂",H:"𝙃",I:"𝙄",J:"𝙅",K:"𝙆",L:"𝙇",M:"𝙈",N:"𝙉",O:"𝙊",P:"𝙋",Q:"𝙌",R:"𝙍",S:"𝙎",T:"𝙏",U:"𝙐",V:"𝙑",W:"𝙒",X:"𝙓",Y:"𝙔",Z:"𝙕"} }
+];
+
+/* ===== helpers & state ===== */
+const ls = window.localStorage;
+let FAVORITES = new Set(JSON.parse(ls.getItem('uftg_favs')||'[]'));
+let RECENT = JSON.parse(ls.getItem('uftg_recent')||'[]');
+
+/* normalize map to map fancy back to latin */
+const NORMALIZE_MAP = {};
+STYLE_DEFS.forEach(style=>{
+  for(const [latin,fancy] of Object.entries(style.map)){
+    if(!NORMALIZE_MAP[fancy]) NORMALIZE_MAP[fancy]=latin;
+  }
+});
+function normalizeChar(ch){ return NORMALIZE_MAP[ch]||ch; }
+
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function transformTextHtml(text,map){
+  if(!text) return '';
+  return Array.from(text).map(ch=>{
+    const base = normalizeChar(ch);
+    return map[base] ? escapeHtml(map[base]) : `<span class="red">${escapeHtml(base)}</span>`;
+  }).join('');
+}
+function transformTextPlain(text,map){
+  if(!text) return '';
+  return Array.from(text).map(ch=>{
+    const base = normalizeChar(ch);
+    return map[base] || base;
+  }).join('');
+}
+
+/* ===== UI renderers ===== */
+function createStyleCard(def){
+  const input = document.getElementById('mainInput').value || '';
+  const transformedHtml = transformTextHtml(input, def.map);
+  const transformedPlain = transformTextPlain(input, def.map);
+
+  const card = document.createElement('div');
+  card.className='card';
+  card.dataset.styleId = def.id;
+
+  const header = document.createElement('div'); header.className='card-header';
+  const title = document.createElement('div'); title.className='card-title'; title.textContent = def.name;
+  const actions = document.createElement('div'); actions.className='card-actions';
+
+  const copyBtn = document.createElement('button'); copyBtn.className='copy-btn'; copyBtn.textContent='Másolás';
+  copyBtn.addEventListener('click', async ()=>{
+    await safeCopy(transformedPlain);
+    showCopyNotice();
+    addRecent(def.id);
+    renderAllSections();
+    // button feedback
+    const sel = `.card[data-style-id="${def.id}"] .copy-btn`;
+    const newBtn = document.querySelector(sel);
+    if(!newBtn) return;
+    const old = newBtn.textContent;
+    newBtn.textContent = '✓ Másolva';
+    newBtn.disabled = true;
+    setTimeout(()=>{ newBtn.textContent = old; newBtn.disabled = false; }, 3000);
+  });
+
+  const star = document.createElement('span'); star.className='star'+(FAVORITES.has(def.id)?' active':'');
+  star.innerText = FAVORITES.has(def.id)?'★':'☆';
+  star.addEventListener('click', ()=> toggleFavorite(def.id));
+
+  actions.appendChild(copyBtn);
+  actions.appendChild(star);
+  header.appendChild(title);
+  header.appendChild(actions);
+
+  const body = document.createElement('div'); body.className='card-body'; body.innerHTML = transformedHtml;
+
+  card.appendChild(header); card.appendChild(body);
+  return card;
+}
+
+function renderFonts(){
+  const c = document.getElementById('fontsList'); c.innerHTML='';
+  STYLE_DEFS.forEach(def=>c.appendChild(createStyleCard(def)));
+}
+function renderRecent(){
+  const c = document.getElementById('recentList'); c.innerHTML='';
+  if(!RECENT.length){ c.innerHTML = `<div style="color:var(--muted);padding:8px">Nincs még legutóbbi stílus.</div>`; return; }
+  RECENT.forEach(id=>{
+    const d = STYLE_DEFS.find(s=>s.id===id);
+    if(d) c.appendChild(createStyleCard(d));
+  });
+}
+function renderFavorites(){
+  const c = document.getElementById('favList'); c.innerHTML='';
+  const favs = STYLE_DEFS.filter(s=>FAVORITES.has(s.id));
+  if(!favs.length){ c.innerHTML = `<div style="color:var(--muted);padding:8px">Nincs kedvenc.</div>`; return; }
+  favs.forEach(d=> c.appendChild(createStyleCard(d)));
+}
+
+function renderAllSections(){ renderFonts(); renderRecent(); renderFavorites(); syncStars(); }
+function syncStars(){ document.querySelectorAll('.card').forEach(c=>{ const id=c.dataset.styleId; if(!id) return; const s=c.querySelector('.star'); if(!s) return; if(FAVORITES.has(id)){ s.classList.add('active'); s.innerText='★'; } else { s.classList.remove('active'); s.innerText='☆'; } }); }
+
+function addRecent(id){
+  if(!id) return;
+  RECENT = [id, ...RECENT.filter(x=>x!==id)].slice(0,5);
+  ls.setItem('uftg_recent', JSON.stringify(RECENT));
+  renderRecent();
+}
+function toggleFavorite(id){
+  if(FAVORITES.has(id)) FAVORITES.delete(id); else FAVORITES.add(id);
+  ls.setItem('uftg_favs', JSON.stringify([...FAVORITES]));
+  renderAllSections();
+}
+
+/* ===== clipboard helpers and notices ===== */
+async function safeCopy(t){
+  if(!t) return;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    try { await navigator.clipboard.writeText(t); return; } catch(e) {}
+  }
+  const ta = document.createElement('textarea'); ta.value = t; ta.style.position='fixed'; ta.style.left='-9999px';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){} document.body.removeChild(ta);
+}
+function showCopyNotice(){ const n=document.getElementById('copyNotice'); if(!n) return; n.classList.add('show'); setTimeout(()=>n.classList.remove('show'),1700); }
+function showPasteNotice(){ const n=document.getElementById('pasteNotice'); if(!n) return; n.classList.add('show'); setTimeout(()=>n.classList.remove('show'),1700); }
+
+/* ===== sections toggle and paste ===== */
+function toggleSectionById(listId,triId){
+  const l=document.getElementById(listId), t=document.getElementById(triId);
+  if(!l||!t) return;
+  if(l.classList.contains('hidden')){ l.classList.remove('hidden'); t.classList.remove('closed'); } else { l.classList.add('hidden'); t.classList.add('closed'); }
+}
+async function doPaste(){
+  try{
+    if(navigator.clipboard && navigator.clipboard.readText){
+      const t = await navigator.clipboard.readText();
+      document.getElementById('mainInput').value = t;
+      ls.setItem('uftg_last_input', t);
+      renderAllSections();
+      showPasteNotice();
+    }
+  }catch(e){}
+}
+
+/* ===== theme/font/load/save ===== */
+function applySavedTheme(){
+  const theme = ls.getItem('uftg_theme');
+  if(!theme) return;
+  if(theme === 'dark'){
+    document.documentElement.setAttribute('data-theme','dark');
+  } else if(theme === 'light'){
+    document.documentElement.removeAttribute('data-theme');
+    // also set color vars if theme is a color
+    if(THEMES[theme]) for(const [k,v] of Object.entries(THEMES[theme])) document.documentElement.style.setProperty(k,v);
+  } else if(THEMES[theme]){
+    // color themes - set variables
+    document.documentElement.removeAttribute('data-theme');
+    for(const [k,v] of Object.entries(THEMES[theme])) document.documentElement.style.setProperty(k,v);
+  }
+}
+function applySavedFont(){
+  const f = ls.getItem('uftg_font'); if(!f) return;
+  document.documentElement.style.setProperty('--font-main', `'${f}', Arial, Helvetica, sans-serif`);
+  document.body.style.fontFamily = `var(--font-main)`;
+}
+
+/* ===== reset settings ===== */
+function resetSettingsToDefault(){
+  ls.removeItem('uftg_theme'); ls.removeItem('uftg_font');
+  document.documentElement.removeAttribute('data-theme');
+  document.documentElement.style.removeProperty('--font-main');
+  document.body.style.fontFamily = '';
+  // re-render to pick up vars
+}
+
+/* ===== init ===== */
+document.addEventListener('DOMContentLoaded', ()=>{
+  const sBtn = document.getElementById('settingsBtn');
+  const sPanel = document.getElementById('settingsPanel');
+  const backdrop = document.getElementById('settingsBackdrop');
+  const pasteBtn = document.getElementById('pasteBtn');
+  const input = document.getElementById('mainInput');
+
+  // load last input
+  input.value = ls.getItem('uftg_last_input') || '';
+  input.addEventListener('input', () => { ls.setItem('uftg_last_input', input.value); // live preview
+    document.querySelectorAll('.card-body').forEach(b=>{ b.innerHTML = transformTextHtml(input.value||'', STYLE_DEFS.find(s=>s.id===b.closest('.card').dataset.styleId)?.map || {}); });
+  });
+
+  // settings open/close
+  sBtn.addEventListener('click', (e)=>{ e.stopPropagation(); const open = sPanel.classList.toggle('active'); backdrop.classList.toggle('active', open); sBtn.setAttribute('aria-expanded', open?'true':'false'); });
+  document.addEventListener('click', (e)=>{ if(!sPanel.contains(e.target) && e.target !== sBtn){ sPanel.classList.remove('active'); backdrop.classList.remove('active'); sBtn.setAttribute('aria-expanded','false'); } });
+
+  // theme buttons
+  document.querySelectorAll('.theme-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const color = btn.dataset.color;
+      if(color === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); ls.setItem('uftg_theme','dark'); }
+      else if(color === 'light'){ document.documentElement.removeAttribute('data-theme'); ls.setItem('uftg_theme','light'); }
+      else if(THEMES[color]){ document.documentElement.removeAttribute('data-theme'); for(const [k,v] of Object.entries(THEMES[color])) document.documentElement.style.setProperty(k,v); ls.setItem('uftg_theme', color); }
+      sPanel.classList.remove('active'); backdrop.classList.remove('active'); sBtn.setAttribute('aria-expanded','false');
+    });
+  });
+
+  // font buttons
+  document.querySelectorAll('.font-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const f = btn.dataset.font;
+      document.documentElement.style.setProperty('--font-main', `'${f}', Arial, Helvetica, sans-serif`);
+      document.body.style.fontFamily = `var(--font-main)`;
+      ls.setItem('uftg_font', f);
+      sPanel.classList.remove('active'); backdrop.classList.remove('active'); sBtn.setAttribute('aria-expanded','false');
+    });
+  });
+
+  // reset settings
+  document.getElementById('resetSettings').addEventListener('click', ()=>{
+    resetSettingsToDefault();
+    ls.removeItem('uftg_theme'); ls.removeItem('uftg_font');
+    alert('Beállítások visszaállítva alapértelmezettre.');
+  });
+
+  // paste
+  pasteBtn.addEventListener('click', doPaste);
+
+  // copy global document copy listener (for native copy)
+  document.addEventListener('copy', ()=> showCopyNotice());
+
+  // sections toggles
+  document.querySelector('[data-target="fontsList"]').addEventListener('click', ()=> toggleSectionById('fontsList','tri-fonts'));
+  document.querySelector('[data-target="recentList"]').addEventListener('click', ()=> toggleSectionById('recentList','tri-recent'));
+  document.querySelector('[data-target="favList"]').addEventListener('click', ()=> toggleSectionById('favList','tri-fav'));
+
+  // apply saved UI settings
+  applySavedTheme();
+  applySavedFont();
+
+  // ensure tri states
+  document.getElementById('tri-fonts').classList.remove('closed');
+  document.getElementById('tri-recent').classList.add('closed');
+  document.getElementById('tri-fav').classList.add('closed');
+
+  // render content
+  renderAllSections();
+});
+</script>
+</body>
+</html>
