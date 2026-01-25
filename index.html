@@ -1,10 +1,9 @@
-
 <!doctype html>
 <html lang="hu">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>UFTG - Unicode Fancy Text Generator</title>
+<title>UFTG - Unicode Text Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Merriweather:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -117,7 +116,7 @@
 <body>
 <header>
   <div class="title">
-    <h1>UFTG</h1>
+    <h1>UTG</h1>
     <p>Unicode Fancy Text Generator</p>
   </div>
 </header>
@@ -188,20 +187,10 @@
 </main>
 
 <script>
-/* ====== CONFIG / DATA ====== */
-const THEMES = {
-  blue:{'--blue':'#1a73e8','--border':'#173a7a','--frame':'#dce6f0','--card-bg':'#e6eef8','--bg':'#f5f6f8','--text':'#111'},
-  yellow:{'--blue':'#fbbc05','--border':'#b68b00','--frame':'#fff4cc','--card-bg':'#fff8e6','--bg':'#fff9ec','--text':'#111'},
-  red:{'--blue':'#ea4335','--border':'#a11d10','--frame':'#ffe5e0','--card-bg':'#ffecec','--bg':'#fff5f4','--text':'#111'},
-  purple:{'--blue':'#a142f4','--border':'#5e239f','--frame':'#f2e5ff','--card-bg':'#f7ecff','--bg':'#fbf6ff','--text':'#111'},
-  green:{'--blue':'#34a853','--border':'#1b6e35','--frame':'#e0f7e9','--card-bg':'#eafbee','--bg':'#f6fff7','--text':'#111'},
-  pink:{'--blue':'#ff5fa2','--border':'#b01f67','--frame':'#ffe0ef','--card-bg':'#fff0f7','--bg':'#fff6fb','--text':'#111'},
-  dark:{'--theme':'dark'},
-  light:{'--theme':'light'}
-};
-
-/* 17 style defs (same as your 3rd version) */
-const STYLE_DEFS = [
+/* =======================
+   STÍLUS DEFINÍCIÓK
+======================= */
+const STYLE_DEFS=[
   {id:'Plain', name:'Plain', map:{a:"a",b:"b",c:"c",d:"d",e:"e",f:"f",g:"g",h:"h",i:"i",j:"j",k:"k",l:"l",m:"m",n:"n",o:"o",p:"p",q:"q",r:"r",s:"s",t:"t",u:"u",v:"v",w:"w",x:"x",y:"y",z:"z",
       A:"A",B:"B",C:"C",D:"D",E:"E",F:"F",G:"G",H:"H",I:"I",J:"J",K:"K",L:"L",M:"M",N:"N",O:"O",P:"P",Q:"Q",R:"R",S:"S",T:"T",U:"U",V:"V",W:"W",X:"X",Y:"Y",Z:"Z"} },
   {id:'Bold', name:'Bold', map:{a:"𝗮",b:"𝗯",c:"𝗰",d:"𝗱",e:"𝗲",f:"𝗳",g:"𝗴",h:"𝗵",i:"𝗶",j:"𝗷",k:"𝗸",l:"𝗹",m:"𝗺",n:"𝗻",o:"𝗼",p:"𝗽",q:"𝗾",r:"𝗿",s:"𝘀",t:"𝘁",u:"𝘂",v:"𝘃",w:"𝘄",x:"𝘅",y:"𝘆",z:"𝘇",
@@ -237,7 +226,12 @@ const STYLE_DEFS = [
   {id:'Sans Italic', name:'Sans Italic', map:{a:"𝘢",b:"𝘣",c:"𝘤",d:"𝘥",e:"𝘦",f:"𝘧",g:"𝘨",h:"𝘩",i:"𝘪",j:"𝘫",k:"𝘬",l:"𝘭",m:"𝘮",n:"𝘯",o:"𝘰",p:"𝘱",q:"𝘲",r:"𝘳",s:"𝘴",t:"𝘵",u:"𝘶",v:"𝘷",w:"𝘸",x:"𝘹",y:"𝘺",z:"𝘻",
       A:"𝘈",B:"𝘉",C:"𝘊",D:"𝘋",E:"𝘌",F:"𝘍",G:"𝘎",H:"𝘏",I:"𝘐",J:"𝘑",K:"𝘒",L:"𝘓",M:"𝘔",N:"𝘕",O:"𝘖",P:"𝘗",Q:"𝘘",R:"𝘙",S:"𝘚",T:"𝘛",U:"𝘜",V:"𝘝",W:"𝘞",X:"𝘟",Y:"𝘠",Z:"𝘡"} },
   {id:'Sans Bold Italic', name:'Sans Bold Italic', map:{a:"𝙖",b:"𝙗",c:"𝙘",d:"𝙙",e:"𝙚",f:"𝙛",g:"𝙜",h:"𝙝",i:"𝙞",j:"𝙟",k:"𝙠",l:"𝙡",m:"𝙢",n:"𝙣",o:"𝙤",p:"𝙥",q:"𝙦",r:"𝙧",s:"𝙨",t:"𝙩",u:"𝙪",v:"𝙫",w:"𝙬",x:"𝙭",y:"𝙮",z:"𝙯",
-      A:"𝘼",B:"𝘽",C:"𝘾",D:"𝘿",E:"𝙀",F:"𝙁",G:"𝙂",H:"𝙃",I:"𝙄",J:"𝙅",K:"𝙆",L:"𝙇",M:"𝙈",N:"𝙉",O:"𝙊",P:"𝙋",Q:"𝙌",R:"𝙍",S:"𝙎",T:"𝙏",U:"𝙐",V:"𝙑",W:"𝙒",X:"𝙓",Y:"𝙔",Z:"𝙕"} }
+      A:"𝘼",B:"𝘽",C:"𝘾",D:"𝘿",E:"𝙀",F:"𝙁",G:"𝙂",H:"𝙃",I:"𝙄",J:"𝙅",K:"𝙆",L:"𝙇",M:"𝙈",N:"𝙉",O:"𝙊",P:"𝙋",Q:"𝙌",R:"𝙍",S:"𝙎",T:"𝙏",U:"𝙐",V:"𝙑",W:"𝙒",X:"𝙓",Y:"𝙔",Z:"𝙕"} },
+];
+/* ------------------ UNICODE KÁRTYÁK ------------------ */
+const SPECIAL_STYLES = [
+  { id:'Unicode code', name:'Unicode code', encode:true },
+  { id:'Decode Unicode', name:'Decode Unicode', decode:true }
 ];
 
 /* ===== helpers & state ===== */
@@ -245,7 +239,7 @@ const ls = window.localStorage;
 let FAVORITES = new Set(JSON.parse(ls.getItem('uftg_favs')||'[]'));
 let RECENT = JSON.parse(ls.getItem('uftg_recent')||'[]');
 
-/* normalize map to map fancy back to latin */
+/* normalize: vissza latinra (auto “Plain”) */
 const NORMALIZE_MAP = {};
 STYLE_DEFS.forEach(style=>{
   for(const [latin,fancy] of Object.entries(style.map)){
@@ -254,231 +248,263 @@ STYLE_DEFS.forEach(style=>{
 });
 function normalizeChar(ch){ return NORMALIZE_MAP[ch]||ch; }
 
-function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-function transformTextHtml(text,map){
+/* ===== encoding / decoding ===== */
+function encodeUnicode(text){
+  return Array.from(text).map(c=>{
+    const cp=c.codePointAt(0).toString(16).toUpperCase().padStart(4,'0');
+    return `U+${cp}`;
+  }).join('');
+}
+
+function decodeUnicode(text){
+  return text.replace(/U\+([0-9A-Fa-f]{4,6})/g,(m,h)=>{
+    const code=parseInt(h,16);
+    try{return String.fromCodePoint(code);}catch{ return m;}
+  });
+}
+
+/* ===== escaping / transforming ===== */
+function escapeHtml(s){
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+function transformTextHtml(text,map,options={}){
   if(!text) return '';
+  if(options.encode) return escapeHtml(encodeUnicode(text));
+  if(options.decode) return escapeHtml(decodeUnicode(text));
+
   return Array.from(text).map(ch=>{
     const base = normalizeChar(ch);
     return map[base] ? escapeHtml(map[base]) : `<span class="red">${escapeHtml(base)}</span>`;
   }).join('');
 }
-function transformTextPlain(text,map){
+
+function transformTextPlain(text,map,options={}){
   if(!text) return '';
+  if(options.encode) return encodeUnicode(text);
+  if(options.decode) return decodeUnicode(text);
+
   return Array.from(text).map(ch=>{
     const base = normalizeChar(ch);
     return map[base] || base;
   }).join('');
 }
 
-/* ===== UI renderers ===== */
+/* ===== UI — kártyák ===== */
 function createStyleCard(def){
   const input = document.getElementById('mainInput').value || '';
-  const transformedHtml = transformTextHtml(input, def.map);
-  const transformedPlain = transformTextPlain(input, def.map);
+  const transformedHtml = transformTextHtml(input, def.map||{}, def);
+  const transformedPlain = transformTextPlain(input, def.map||{}, def);
 
-  const card = document.createElement('div');
-  card.className='card';
-  card.dataset.styleId = def.id;
+  const card=document.createElement('div'); card.className='card'; card.dataset.styleId=def.id;
 
-  const header = document.createElement('div'); header.className='card-header';
-  const title = document.createElement('div'); title.className='card-title'; title.textContent = def.name;
-  const actions = document.createElement('div'); actions.className='card-actions';
+  const header=document.createElement('div'); header.className='card-header';
+  const title=document.createElement('div'); title.className='card-title'; title.textContent=def.name;
+  const actions=document.createElement('div'); actions.className='card-actions';
 
-  const copyBtn = document.createElement('button'); copyBtn.className='copy-btn'; copyBtn.textContent='Másolás';
+  const copyBtn=document.createElement('button'); copyBtn.className='copy-btn'; copyBtn.textContent='Másolás';
   copyBtn.addEventListener('click', async ()=>{
     await safeCopy(transformedPlain);
     showCopyNotice();
     addRecent(def.id);
     renderAllSections();
-    // button feedback
-    const sel = `.card[data-style-id="${def.id}"] .copy-btn`;
-    const newBtn = document.querySelector(sel);
+    const sel=`.card[data-style-id="${def.id}"] .copy-btn`;
+    const newBtn=document.querySelector(sel);
     if(!newBtn) return;
-    const old = newBtn.textContent;
-    newBtn.textContent = '✓ Másolva';
-    newBtn.disabled = true;
-    setTimeout(()=>{ newBtn.textContent = old; newBtn.disabled = false; }, 3000);
+    const old=newBtn.textContent;
+    newBtn.textContent='✓ Másolva'; newBtn.disabled=true;
+    setTimeout(()=>{ newBtn.textContent=old; newBtn.disabled=false; },3000);
   });
 
-  const star = document.createElement('span'); star.className='star'+(FAVORITES.has(def.id)?' active':'');
-  star.innerText = FAVORITES.has(def.id)?'★':'☆';
+  const star=document.createElement('span'); star.className='star'+(FAVORITES.has(def.id)?' active':'');
+  star.innerText=FAVORITES.has(def.id)?'★':'☆';
   star.addEventListener('click', ()=> toggleFavorite(def.id));
 
-  actions.appendChild(copyBtn);
-  actions.appendChild(star);
-  header.appendChild(title);
-  header.appendChild(actions);
+  actions.appendChild(copyBtn); actions.appendChild(star);
+  header.appendChild(title); header.appendChild(actions);
 
-  const body = document.createElement('div'); body.className='card-body'; body.innerHTML = transformedHtml;
+  const body=document.createElement('div'); body.className='card-body'; body.innerHTML=transformedHtml;
 
   card.appendChild(header); card.appendChild(body);
   return card;
 }
 
+/* renderelők */
 function renderFonts(){
-  const c = document.getElementById('fontsList'); c.innerHTML='';
-  STYLE_DEFS.forEach(def=>c.appendChild(createStyleCard(def)));
+  const c=document.getElementById('fontsList'); c.innerHTML='';
+  [...STYLE_DEFS, ...SPECIAL_STYLES].forEach(def=>c.appendChild(createStyleCard(def)));
 }
 function renderRecent(){
-  const c = document.getElementById('recentList'); c.innerHTML='';
-  if(!RECENT.length){ c.innerHTML = `<div style="color:var(--muted);padding:8px">Nincs még legutóbbi stílus.</div>`; return; }
+  const c=document.getElementById('recentList'); c.innerHTML='';
+  if(!RECENT.length){ c.innerHTML=`<div style="color:var(--muted);padding:8px">Nincs még legutóbbi stílus.</div>`; return;}
   RECENT.forEach(id=>{
-    const d = STYLE_DEFS.find(s=>s.id===id);
+    const d=[...STYLE_DEFS,...SPECIAL_STYLES].find(s=>s.id===id);
     if(d) c.appendChild(createStyleCard(d));
   });
 }
 function renderFavorites(){
-  const c = document.getElementById('favList'); c.innerHTML='';
-  const favs = STYLE_DEFS.filter(s=>FAVORITES.has(s.id));
-  if(!favs.length){ c.innerHTML = `<div style="color:var(--muted);padding:8px">Nincs kedvenc.</div>`; return; }
-  favs.forEach(d=> c.appendChild(createStyleCard(d)));
+  const c=document.getElementById('favList'); c.innerHTML='';
+  const favs=[...STYLE_DEFS,...SPECIAL_STYLES].filter(s=>FAVORITES.has(s.id));
+  if(!favs.length){ c.innerHTML=`<div style="color:var(--muted);padding:8px">Nincs kedvenc.</div>`; return;}
+  favs.forEach(d=>c.appendChild(createStyleCard(d)));
 }
 
 function renderAllSections(){ renderFonts(); renderRecent(); renderFavorites(); syncStars(); }
-function syncStars(){ document.querySelectorAll('.card').forEach(c=>{ const id=c.dataset.styleId; if(!id) return; const s=c.querySelector('.star'); if(!s) return; if(FAVORITES.has(id)){ s.classList.add('active'); s.innerText='★'; } else { s.classList.remove('active'); s.innerText='☆'; } }); }
+function syncStars(){
+  document.querySelectorAll('.card').forEach(c=>{
+    const id=c.dataset.styleId; if(!id) return;
+    const s=c.querySelector('.star'); if(!s) return;
+    if(FAVORITES.has(id)){s.classList.add('active');s.innerText='★';}
+    else{s.classList.remove('active');s.innerText='☆';}
+  });
+}
 
+/* state helpers */
 function addRecent(id){
   if(!id) return;
-  RECENT = [id, ...RECENT.filter(x=>x!==id)].slice(0,5);
-  ls.setItem('uftg_recent', JSON.stringify(RECENT));
+  RECENT=[id,...RECENT.filter(x=>x!==id)].slice(0,5);
+  ls.setItem('uftg_recent',JSON.stringify(RECENT));
   renderRecent();
 }
 function toggleFavorite(id){
   if(FAVORITES.has(id)) FAVORITES.delete(id); else FAVORITES.add(id);
-  ls.setItem('uftg_favs', JSON.stringify([...FAVORITES]));
+  ls.setItem('uftg_favs',JSON.stringify([...FAVORITES]));
   renderAllSections();
 }
 
-/* ===== clipboard helpers and notices ===== */
+/* clipboard */
 async function safeCopy(t){
   if(!t) return;
   if(navigator.clipboard && navigator.clipboard.writeText){
-    try { await navigator.clipboard.writeText(t); return; } catch(e) {}
+    try{ await navigator.clipboard.writeText(t); return; }catch(e){}
   }
-  const ta = document.createElement('textarea'); ta.value = t; ta.style.position='fixed'; ta.style.left='-9999px';
+  const ta=document.createElement('textarea');
+  ta.value=t; ta.style.position='fixed'; ta.style.left='-9999px';
   document.body.appendChild(ta); ta.select();
-  try{ document.execCommand('copy'); }catch(e){} document.body.removeChild(ta);
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
 }
 function showCopyNotice(){ const n=document.getElementById('copyNotice'); if(!n) return; n.classList.add('show'); setTimeout(()=>n.classList.remove('show'),1700); }
 function showPasteNotice(){ const n=document.getElementById('pasteNotice'); if(!n) return; n.classList.add('show'); setTimeout(()=>n.classList.remove('show'),1700); }
 
-/* ===== sections toggle and paste ===== */
+/* sections toggle + paste */
 function toggleSectionById(listId,triId){
-  const l=document.getElementById(listId), t=document.getElementById(triId);
+  const l=document.getElementById(listId),t=document.getElementById(triId);
   if(!l||!t) return;
-  if(l.classList.contains('hidden')){ l.classList.remove('hidden'); t.classList.remove('closed'); } else { l.classList.add('hidden'); t.classList.add('closed'); }
+  if(l.classList.contains('hidden')){ l.classList.remove('hidden'); t.classList.remove('closed'); }
+  else{ l.classList.add('hidden'); t.classList.add('closed'); }
 }
 async function doPaste(){
   try{
     if(navigator.clipboard && navigator.clipboard.readText){
-      const t = await navigator.clipboard.readText();
-      document.getElementById('mainInput').value = t;
-      ls.setItem('uftg_last_input', t);
+      const t=await navigator.clipboard.readText();
+      document.getElementById('mainInput').value=t;
+      ls.setItem('uftg_last_input',t);
       renderAllSections();
       showPasteNotice();
     }
   }catch(e){}
 }
 
-/* ===== theme/font/load/save ===== */
+/* theme/font */
 function applySavedTheme(){
-  const theme = ls.getItem('uftg_theme');
+  const theme=ls.getItem('uftg_theme');
   if(!theme) return;
-  if(theme === 'dark'){
-    document.documentElement.setAttribute('data-theme','dark');
-  } else if(theme === 'light'){
-    document.documentElement.removeAttribute('data-theme');
-    // also set color vars if theme is a color
-    if(THEMES[theme]) for(const [k,v] of Object.entries(THEMES[theme])) document.documentElement.style.setProperty(k,v);
-  } else if(THEMES[theme]){
-    // color themes - set variables
-    document.documentElement.removeAttribute('data-theme');
-    for(const [k,v] of Object.entries(THEMES[theme])) document.documentElement.style.setProperty(k,v);
-  }
+  if(theme==='dark'){ document.documentElement.setAttribute('data-theme','dark'); }
+  else if(theme==='light'){ document.documentElement.removeAttribute('data-theme'); }
+  else{ document.documentElement.removeAttribute('data-theme'); }
 }
 function applySavedFont(){
-  const f = ls.getItem('uftg_font'); if(!f) return;
+  const f=ls.getItem('uftg_font'); if(!f) return;
   document.documentElement.style.setProperty('--font-main', `'${f}', Arial, Helvetica, sans-serif`);
-  document.body.style.fontFamily = `var(--font-main)`;
+  document.body.style.fontFamily='var(--font-main)';
 }
 
-/* ===== reset settings ===== */
+/* reset */
 function resetSettingsToDefault(){
   ls.removeItem('uftg_theme'); ls.removeItem('uftg_font');
   document.documentElement.removeAttribute('data-theme');
   document.documentElement.style.removeProperty('--font-main');
-  document.body.style.fontFamily = '';
-  // re-render to pick up vars
+  document.body.style.fontFamily='';
 }
 
-/* ===== init ===== */
-document.addEventListener('DOMContentLoaded', ()=>{
-  const sBtn = document.getElementById('settingsBtn');
-  const sPanel = document.getElementById('settingsPanel');
-  const backdrop = document.getElementById('settingsBackdrop');
-  const pasteBtn = document.getElementById('pasteBtn');
-  const input = document.getElementById('mainInput');
+/* init */
+document.addEventListener('DOMContentLoaded',()=>{
+  const sBtn=document.getElementById('settingsBtn');
+  const sPanel=document.getElementById('settingsPanel');
+  const backdrop=document.getElementById('settingsBackdrop');
+  const pasteBtn=document.getElementById('pasteBtn');
+  const input=document.getElementById('mainInput');
 
-  // load last input
-  input.value = ls.getItem('uftg_last_input') || '';
-  input.addEventListener('input', () => { ls.setItem('uftg_last_input', input.value); // live preview
-    document.querySelectorAll('.card-body').forEach(b=>{ b.innerHTML = transformTextHtml(input.value||'', STYLE_DEFS.find(s=>s.id===b.closest('.card').dataset.styleId)?.map || {}); });
+  input.value=ls.getItem('uftg_last_input')||'';
+  input.addEventListener('input',()=>{
+    ls.setItem('uftg_last_input',input.value);
+    document.querySelectorAll('.card-body').forEach(b=>{
+      const id=b.closest('.card').dataset.styleId;
+      const def=[...STYLE_DEFS,...SPECIAL_STYLES].find(s=>s.id===id)||{};
+      b.innerHTML=transformTextHtml(input.value||'',def.map||{},def);
+    });
   });
 
-  // settings open/close
-  sBtn.addEventListener('click', (e)=>{ e.stopPropagation(); const open = sPanel.classList.toggle('active'); backdrop.classList.toggle('active', open); sBtn.setAttribute('aria-expanded', open?'true':'false'); });
-  document.addEventListener('click', (e)=>{ if(!sPanel.contains(e.target) && e.target !== sBtn){ sPanel.classList.remove('active'); backdrop.classList.remove('active'); sBtn.setAttribute('aria-expanded','false'); } });
+  sBtn.addEventListener('click',(e)=>{
+    e.stopPropagation();
+    const open=sPanel.classList.toggle('active');
+    backdrop.classList.toggle('active',open);
+    sBtn.setAttribute('aria-expanded',open?'true':'false');
+  });
+  document.addEventListener('click',(e)=>{
+    if(!sPanel.contains(e.target) && e.target!==sBtn){
+      sPanel.classList.remove('active'); backdrop.classList.remove('active');
+      sBtn.setAttribute('aria-expanded','false');
+    }
+  });
 
-  // theme buttons
   document.querySelectorAll('.theme-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const color = btn.dataset.color;
-      if(color === 'dark'){ document.documentElement.setAttribute('data-theme','dark'); ls.setItem('uftg_theme','dark'); }
-      else if(color === 'light'){ document.documentElement.removeAttribute('data-theme'); ls.setItem('uftg_theme','light'); }
-      else if(THEMES[color]){ document.documentElement.removeAttribute('data-theme'); for(const [k,v] of Object.entries(THEMES[color])) document.documentElement.style.setProperty(k,v); ls.setItem('uftg_theme', color); }
-      sPanel.classList.remove('active'); backdrop.classList.remove('active'); sBtn.setAttribute('aria-expanded','false');
+    btn.addEventListener('click',()=>{
+      const color=btn.dataset.color;
+      if(color==='dark'){ document.documentElement.setAttribute('data-theme','dark'); }
+      else if(color==='light'){ document.documentElement.removeAttribute('data-theme'); }
+      ls.setItem('uftg_theme',color);
+      sPanel.classList.remove('active'); backdrop.classList.remove('active');
+      sBtn.setAttribute('aria-expanded','false');
     });
   });
 
-  // font buttons
   document.querySelectorAll('.font-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const f = btn.dataset.font;
+    btn.addEventListener('click',()=>{
+      const f=btn.dataset.font;
       document.documentElement.style.setProperty('--font-main', `'${f}', Arial, Helvetica, sans-serif`);
-      document.body.style.fontFamily = `var(--font-main)`;
-      ls.setItem('uftg_font', f);
-      sPanel.classList.remove('active'); backdrop.classList.remove('active'); sBtn.setAttribute('aria-expanded','false');
+      document.body.style.fontFamily='var(--font-main)';
+      ls.setItem('uftg_font',f);
+      sPanel.classList.remove('active'); backdrop.classList.remove('active');
+      sBtn.setAttribute('aria-expanded','false');
     });
   });
 
-  // reset settings
-  document.getElementById('resetSettings').addEventListener('click', ()=>{
+  document.getElementById('resetSettings').addEventListener('click',()=>{
     resetSettingsToDefault();
-    ls.removeItem('uftg_theme'); ls.removeItem('uftg_font');
     alert('Beállítások visszaállítva alapértelmezettre.');
   });
 
-  // paste
-  pasteBtn.addEventListener('click', doPaste);
+  pasteBtn.addEventListener('click',doPaste);
+  document.addEventListener('copy',()=>showCopyNotice());
 
-  // copy global document copy listener (for native copy)
-  document.addEventListener('copy', ()=> showCopyNotice());
+  document.querySelector('[data-target="fontsList"]').addEventListener('click',()=>toggleSectionById('fontsList','tri-fonts'));
+  document.querySelector('[data-target="recentList"]').addEventListener('click',()=>toggleSectionById('recentList','tri-recent'));
+  document.querySelector('[data-target="favList"]').addEventListener('click',()=>toggleSectionById('favList','tri-fav'));
 
-  // sections toggles
-  document.querySelector('[data-target="fontsList"]').addEventListener('click', ()=> toggleSectionById('fontsList','tri-fonts'));
-  document.querySelector('[data-target="recentList"]').addEventListener('click', ()=> toggleSectionById('recentList','tri-recent'));
-  document.querySelector('[data-target="favList"]').addEventListener('click', ()=> toggleSectionById('favList','tri-fav'));
-
-  // apply saved UI settings
   applySavedTheme();
   applySavedFont();
 
-  // ensure tri states
   document.getElementById('tri-fonts').classList.remove('closed');
   document.getElementById('tri-recent').classList.add('closed');
   document.getElementById('tri-fav').classList.add('closed');
 
-  // render content
   renderAllSections();
 });
 </script>
